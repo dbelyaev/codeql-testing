@@ -2,11 +2,9 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
   schedule:
-    - cron: '0 0 * * 0'  # еженедельно по воскресеньям
+    - cron: '0 0 * * 0'  # every Sunday at midnight UTC
 
 jobs:
 
@@ -15,9 +13,15 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
+      # required for all workflows
+      security-events: write
+
+      # required to fetch internal or private CodeQL packs
+      packages: read
+
+      # only required for workflows in private repositories
       actions: read
       contents: read
-      security-events: write
 
     strategy:
       fail-fast: false
