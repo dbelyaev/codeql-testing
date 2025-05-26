@@ -42,6 +42,9 @@ jobs:
           cache: "maven"
 
       - name: Build & Run Tests
+        env:
+          PACKAGES_USER_NAME: ${{ vars.PACKAGES_USER_NAME }}
+          PACKAGES_USER_TOKEN: ${{ secrets.PACKAGES_USER_TOKEN }}
         run: mvn clean verify --no-transfer-progress
 
       - name: Publish Tests Report

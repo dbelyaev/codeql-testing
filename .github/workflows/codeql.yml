@@ -45,6 +45,9 @@ jobs:
         languages: ${{ matrix.language }}
 
     - name: Build with Maven
+      env:
+        PACKAGES_USER_NAME: ${{ vars.PACKAGES_USER_NAME }}
+        PACKAGES_USER_TOKEN: ${{ secrets.PACKAGES_USER_TOKEN }}
       run: mvn -B clean install -DskipTests
 
     - name: Perform CodeQL Analysis
