@@ -15,10 +15,8 @@ jobs:
     permissions:
       # required for all workflows
       security-events: write
-
       # required to fetch internal or private CodeQL packs
       packages: read
-
       # only required for workflows in private repositories
       actions: read
       contents: read
@@ -26,11 +24,30 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'java' ]
+        include:
+          - language: actions
+            build-mode: none
+          - language: java-kotlin
+            build-mode: manual
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+    - name: Create ~/.m2/settings.xml
+      run: |
+        mkdir -p ~/.m2
+        cat > ~/.m2/settings.xml <<EOL
+        <settings>
+          <servers>
+            <server>
+              <id>github-equinor-liquids</id>
+              <username>${{ vars.PACKAGES_USER_NAME }}</username>
+              <password>${{ secrets.PACKAGES_USER_TOKEN }}</password>
+            </server>
+          </servers>
+        </settings>
+        EOL
 
     - name: Setup Java
       uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
@@ -40,15 +57,15 @@ jobs:
         cache: "maven"
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
+      uses: github/codeql-action/init@ff0a06e83cb2de871e5a09832bc6a81e7276941f # v3.28.18
       with:
         languages: ${{ matrix.language }}
 
-    - name: Build with Maven
-      env:
-        PACKAGES_USER_NAME: ${{ vars.PACKAGES_USER_NAME }}
-        PACKAGES_USER_TOKEN: ${{ secrets.PACKAGES_USER_TOKEN }}
-      run: mvn -B clean install -DskipTests --settings settings.xml --no-transfer-progress
+    # if the build mode is 'none', skip the build step
+    - if: matrix.build-mode == 'manual'
+      name: Build Java project with Maven
+      run: mvn -B clean package -DskipTests --no-transfer-progress
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
+      uses: github/codeql-action/analyze@ff0a06e83cb2de871e5a09832bc6a81e7276941f # v3.28.18
+
