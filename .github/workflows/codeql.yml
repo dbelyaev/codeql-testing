@@ -48,7 +48,7 @@ jobs:
       env:
         PACKAGES_USER_NAME: ${{ vars.PACKAGES_USER_NAME }}
         PACKAGES_USER_TOKEN: ${{ secrets.PACKAGES_USER_TOKEN }}
-      run: mvn -B clean install -DskipTests --settings settings.xml
+      run: mvn -B clean install -DskipTests --settings settings.xml --no-transfer-progress
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3

@@ -45,7 +45,7 @@ jobs:
         env:
           PACKAGES_USER_NAME: ${{ vars.PACKAGES_USER_NAME }}
           PACKAGES_USER_TOKEN: ${{ secrets.PACKAGES_USER_TOKEN }}
-        run: mvn clean verify --settings settings.xml --no-transfer-progress
+        run: mvn -B clean verify --settings settings.xml --no-transfer-progress
 
       - name: Publish Tests Report
         uses: dorny/test-reporter@890a17cecf52a379fc869ab770a71657660be727 # v2.1.0
